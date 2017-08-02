@@ -6,13 +6,21 @@ using System.Threading.Tasks;
 
 namespace MultipleChoiceApp
 {
-    class Student
+    class Student : Person
     {
-        public Student()
-        {
+        private string studentNumber;
 
+        public Student(string name, string studentNumber) : base(name)
+        {
+            this.studentNumber = studentNumber;
         }
 
+        public override string ReturnInfo()
+        {
+            string info;
+            info = String.Format("Name : {0}\nStudent Number : {1}", name, studentNumber);
+            return info;
+        }
 
     }
 }
