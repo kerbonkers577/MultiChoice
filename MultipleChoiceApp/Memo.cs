@@ -6,14 +6,8 @@ using System.Threading.Tasks;
 
 namespace MultipleChoiceApp
 {
-    class Test
+    class Memo
     {
-        Teacher author;
         List<Question> questions = new List<Question>();
-
-        public void AddQuestion(Question question)
-        {
-            questions.Add(question);
-        }
     }
 }
