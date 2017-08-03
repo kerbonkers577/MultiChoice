@@ -9,6 +9,6 @@ namespace MultipleChoiceApp
     class Test
     {
         Teacher author;
-
+        List<Question> questions = new List<Question>();
     }
 }
