@@ -15,6 +15,11 @@ namespace MultipleChoiceApp
 
             int response = Convert.ToInt16(Console.ReadKey());
 
+            //TODO: Value denoting where in the menu you currently are
+            //E.g. 0 = exit
+            //But depending on the value, it will tka you to a specfic switch statement which
+            //will have a static method to show an interface with methods to return to the previous menu
+
             if(response == 1)
             {
 
@@ -32,6 +37,22 @@ namespace MultipleChoiceApp
             Console.ForegroundColor = ConsoleColor.DarkGray;
             Console.WriteLine("Enter an integer value (e.g 1, 2, 3, 4 etc.) to give an answer");
             Console.ForegroundColor = ConsoleColor.White;
+        }
+
+        public static void DispalyStudentLoginInterface()
+        {
+            Console.WriteLine("Are you a(n) :\n(1) New student\n(2) Existing student");
+            int Response = Convert.ToInt16(Console.ReadKey());
+
+            if(Response == 1)
+            {
+
+            }
+        }
+
+        public static void DisplayStudentInterface()
+        {
+            string interfaceOptions = "";
         }
     }
 }
