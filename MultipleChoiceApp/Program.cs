@@ -25,57 +25,54 @@ namespace MultipleChoiceApp
             bool loggedInStudent = false;
             bool activeTeacher = false;
 
-
+            
             while(response != 0)
             {
-                switch (response)
-                {
-                    case 1:
-                        //Teacher
-                        DisplayTeacherLoginInterface();
-                        break;
-                    case 2:
-                        //Student
-                        response = DisplayStudentLoginInterface();
-                        break;
-                    case 3:
-                        response = NewStudentMenu();
-                        break;
-                    case 4:
-                        ExisitingStudentMenu();
-                        break;
-                    case 5:
-                        DisplayStudentInterface();
-                        break;
-
-                }
-
                 if(response == 1)//Teacher
                 {
-                    DisplayTeacherLoginInterface();
+                    response = DisplayTeacherLoginInterface();
                     activeTeacher = true;
                 }
                 else if(response == 2)//Student
                 {
-                    DisplayStudentLoginInterface();
+                    response = DisplayStudentLoginInterface();
                     loggedInStudent = true;
                 }
                 else if(response == 3 && loggedInStudent == true)//New Student
                 {
-
+                    response = NewStudentMenu();
                 }
                 else if(response == 4 && loggedInStudent == true)//Existing Student
                 {
-
+                    ExisitingStudentMenu();
                 }
                 else if(response == 5 && loggedInStudent == true)//Student Interface
                 {
-
+                    DisplayStudentInterface();
+                }
+                else
+                {
+                    switch(response)
+                    {
+                        case 1:
+                            response = DisplayTeacherLoginInterface();
+                            break;
+                        case 2:
+                            response = DisplayStudentLoginInterface();
+                            break;
+                        case 3:
+                            response = NewStudentMenu();
+                            break;
+                        case 4:
+                            response = ExisitingStudentMenu();
+                            break;
+                        case 5:
+                            response = DisplayStudentInterface();
+                            break;
+                    }
                 }
             }
-            
 
-            Console.ReadKey();
         }
 
 
@@ -172,16 +169,30 @@ namespace MultipleChoiceApp
             return Response;
         }
         //4
-        public static void ExisitingStudentMenu()
+        public static int ExisitingStudentMenu()
         {
+            int passSuccessful = 5;//Pass value back if correct login
             Console.Clear();
             Console.WriteLine("Please enter your student number to login:\n");
+            return passSuccessful;
         }
         //5
-        public static void DisplayStudentInterface()
+        public static int DisplayStudentInterface()
         {
+            int Response;
             Console.Clear();
             Console.WriteLine("Would you like to :\n(1) Take a test\n(2) View your marks");
+            Response = Convert.ToInt16(Console.ReadLine());
+
+            switch(Response)
+            {
+                case 1:
+                    break;
+                case 2:
+                    break;
+            }
+
+            return Response;
         }
     }
 }
