@@ -10,7 +10,7 @@ namespace MultipleChoiceApp
     {
         private string subject;
 
-        
+        public Teacher(){ }
 
         public Teacher(string name, string subject) : base(name)
         {
