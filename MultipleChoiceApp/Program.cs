@@ -8,12 +8,15 @@ namespace MultipleChoiceApp
 {
     class Program
     {
+
         static void Main(string[] args)
         {
             Console.WriteLine("Welcome to the multiple choice application\nAre you a:\n(1) Teacher\n(2) Student");
             DisplayUserFunctionality();
 
             int response = Convert.ToInt32(Console.ReadLine());
+
+            
 
             //TODO: Value denoting where in the menu you currently are
             //E.g. 0 = exit
@@ -50,31 +53,31 @@ namespace MultipleChoiceApp
                 {
                     DisplayStudentInterface();
                 }
+                else if(response == 6 && activeTeacher == true)
+                {
+                    ViewStudentsMarks();
+                }
+                else if(response == 7 && activeTeacher == true)
+                {
+
+                }
                 else
                 {
-                    switch(response)
-                    {
-                        case 1:
-                            response = DisplayTeacherLoginInterface();
-                            break;
-                        case 2:
-                            response = DisplayStudentLoginInterface();
-                            break;
-                        case 3:
-                            response = NewStudentMenu();
-                            break;
-                        case 4:
-                            response = ExisitingStudentMenu();
-                            break;
-                        case 5:
-                            response = DisplayStudentInterface();
-                            break;
-                    }
+                    Console.Clear();
+                    Console.WriteLine("Welcome to the multiple choice application\nAre you a:\n(1) Teacher\n(2) Student");
+                    DisplayUserFunctionality();
+
+                    response = Convert.ToInt32(Console.ReadLine());
                 }
             }
 
         }
 
+        //---------------------------------
+        //TODO: Add restrictions to input range
+        //If user inputs 3 with only 1 and 2 as options
+        //bring up warning
+        //---------------------------------
 
         //Numbering is assigned to method to comply with switch statement
         //All users
@@ -96,20 +99,39 @@ namespace MultipleChoiceApp
             switch (Response)
             {
                 case 1:
-                    //Response = 3;
+                    Response = 7;
                     break;
                 case 2:
-                    //Response = 4;
+                    Response = 6;
                     break;
             }
 
             return Response;
         }
-        //
+        
+        //6
         public static void ViewStudentsMarks()
         {
             //Return student to display
         }
+
+        //7
+        public static void PrepTest()
+        {
+            Console.Clear();
+            Console.WriteLine("What is the name of the test?:\n");
+            string testName = Console.ReadLine();
+
+            Test newTest = new Test();
+
+        }
+
+        //8
+        public static void MakeTest()
+        {
+
+        }
+         
 
         //Student
         //2

@@ -8,12 +8,28 @@ namespace MultipleChoiceApp
 {
     class Test
     {
-        Teacher author;
+        private Teacher author;
+        private string testName;
         List<Question> questions = new List<Question>();
+
+        public void SetTestName(string testName)
+        {
+            this.testName = testName;
+        }
+
+        public string GetTestName()
+        {
+            return testName;
+        }
 
         public void AddQuestion(Question question)
         {
             questions.Add(question);
+        }
+
+        public List<Question> ReturnQuestions()
+        {
+            return questions;
         }
     }
 }
