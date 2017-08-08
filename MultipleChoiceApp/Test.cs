@@ -9,6 +9,19 @@ namespace MultipleChoiceApp
     class Test
     {
         private Teacher author;
+
+        public Teacher Author
+        {
+            set
+            {
+                author = value;
+            }
+            get
+            {
+                return author;
+            }
+        }
+
         private string testName;
         List<Question> questions = new List<Question>();
 
