@@ -8,8 +8,8 @@ namespace MultipleChoiceApp
 {
     class Program
     {
-        private static Test tempTest;
         private static Teacher tempTeacher;
+        
         static void Main(string[] args)
         {
             Console.WriteLine("Welcome to the multiple choice application\nAre you a:\n(1) Teacher\n(2) Student");
@@ -17,13 +17,14 @@ namespace MultipleChoiceApp
 
             int response = Convert.ToInt32(Console.ReadLine());
             Test testToWrite = new Test();
-            Teacher teacherforTest = new Teacher();
+            List<Test> allTests = new List<Test>();
 
             //TODO: Value denoting where in the menu you currently are
             //E.g. 0 = exit
             //But depending on the value, it will tka you to a specfic switch statement which
             //will have a static method to show an interface with methods to return to the previous menu
             //Navigate menu with switch statement wrapped by while loop
+
 
             //To not jump ahead in the menu
             bool loggedInStudent = false;
@@ -52,25 +53,41 @@ namespace MultipleChoiceApp
                 }
                 else if(response == 5 && loggedInStudent == true)//Student Interface
                 {
-                    DisplayStudentInterface();
+                    response = DisplayStudentInterface();
                 }
-                else if(response == 6 && activeTeacher == true)
+                else if(response == 6 && activeTeacher == true)//Teacher views student's marks
                 {
                     ViewStudentsMarks();
                 }
-                else if(response == 7 && activeTeacher == true)
+                else if(response == 7 && activeTeacher == true)//Prep Test (Author, subject)
                 {
                     response = PrepTest();
                 }
-                else if(response == 8 && activeTeacher == true)
+                else if(response == 8 && activeTeacher == true)//Make the multiple choice question
                 {
                     testToWrite = MakeTest();
-                    testToWrite.Author = teacherforTest;
+                    testToWrite.Author = tempTeacher;
+                    allTests.Add(testToWrite);
+                    response = 1;
                 }
-                else
+                else if(response == 9 && loggedInStudent == true)//Look at test menu
+                {
+                    ViewTests(allTests);
+                }
+                else if(response == 10 && loggedInStudent == true)//Student views marks
+                {
+                    Console.WriteLine("View marks menu");
+                }
+                else if(response == 11 && loggedInStudent == true)//Student takes selected test
+                {
+
+                }
+                else//Use to circumvent out of range input for now
                 {
                     Console.Clear();
                     Console.WriteLine("Welcome to the multiple choice application\nAre you a:\n(1) Teacher\n(2) Student");
+                    loggedInStudent = false;
+                    activeTeacher = false;
                     DisplayUserFunctionality();
 
                     response = Convert.ToInt32(Console.ReadLine());
@@ -92,6 +109,8 @@ namespace MultipleChoiceApp
 
         //Numbering is assigned to method to comply with if statement
         //All users
+
+
         public static void DisplayUserFunctionality()
         {
             Console.ForegroundColor = ConsoleColor.DarkGray;
@@ -252,7 +271,6 @@ namespace MultipleChoiceApp
                 Console.ForegroundColor = ConsoleColor.White;
                 Console.WriteLine("Press any key to confirm\n");
                 Console.ReadKey();
-
             }
             return Response;
         }
@@ -262,6 +280,7 @@ namespace MultipleChoiceApp
             int passSuccessful = 5;//Pass value back if correct login
             Console.Clear();
             Console.WriteLine("Please enter your student number to login:\n");
+            //TODO: Go through students for existing students
             return passSuccessful;
         }
         //5
@@ -275,12 +294,39 @@ namespace MultipleChoiceApp
             switch(Response)
             {
                 case 1:
+                    Response = 9;
                     break;
                 case 2:
+
                     break;
             }
 
             return Response;
+        }
+
+        //9
+        public static int ViewTests(List<Test> tests)
+        {
+            int Response;//Need to return selected test and next menu int
+            Console.WriteLine("Select a test to write by entering the corresponding number");
+            for (int i = 0; i < tests.Count; i++)
+            {
+                Console.WriteLine("(" + i + ") " + tests[i].GetTestName() + "\n");
+            }
+            Response = Convert.ToInt32(Console.ReadLine());
+            return Response;
+        }
+        
+        //10
+        public void ViewOwnMarks()
+        {
+
+        }
+
+        //11
+        public void TakeSelectedTest()
+        {
+
         }
     }
 }
