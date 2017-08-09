@@ -19,6 +19,7 @@ namespace MultipleChoiceApp
             int response = Convert.ToInt32(Console.ReadLine());
             Test testToWrite = new Test();
             List<Test> allTests = new List<Test>();
+            Student activeStudent = new Student();
 
             //TODO: Value denoting where in the menu you currently are
             //E.g. 0 = exit

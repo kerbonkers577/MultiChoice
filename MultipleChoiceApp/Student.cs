@@ -10,6 +10,8 @@ namespace MultipleChoiceApp
     {
         private string studentNumber;
 
+        public Student() { }
+
         public Student(string name, string studentNumber) : base(name)
         {
             this.studentNumber = studentNumber;
@@ -20,6 +22,16 @@ namespace MultipleChoiceApp
             string info;
             info = String.Format("Name : {0}\nStudent Number : {1}", name, studentNumber);
             return info;
+        }
+
+        public string GetName()
+        {
+            return name;
+        }
+
+        public string GetStudentNumber()
+        {
+            return studentNumber;
         }
 
     }
