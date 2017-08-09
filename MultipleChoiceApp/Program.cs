@@ -9,7 +9,8 @@ namespace MultipleChoiceApp
     class Program
     {
         private static Teacher tempTeacher;
-        
+        private static int activeTest;
+
         static void Main(string[] args)
         {
             Console.WriteLine("Welcome to the multiple choice application\nAre you a:\n(1) Teacher\n(2) Student");
@@ -21,7 +22,7 @@ namespace MultipleChoiceApp
 
             //TODO: Value denoting where in the menu you currently are
             //E.g. 0 = exit
-            //But depending on the value, it will tka you to a specfic switch statement which
+            //But depending on the value, it will take you to a specfic switch statement which
             //will have a static method to show an interface with methods to return to the previous menu
             //Navigate menu with switch statement wrapped by while loop
 
@@ -72,7 +73,8 @@ namespace MultipleChoiceApp
                 }
                 else if(response == 9 && loggedInStudent == true)//Look at test menu
                 {
-                    ViewTests(allTests);
+                    testToWrite = allTests[ViewTests(allTests)];
+                    response = 11;
                 }
                 else if(response == 10 && loggedInStudent == true)//Student views marks
                 {
@@ -80,7 +82,7 @@ namespace MultipleChoiceApp
                 }
                 else if(response == 11 && loggedInStudent == true)//Student takes selected test
                 {
-
+                    TakeSelectedTest(testToWrite); 
                 }
                 else//Use to circumvent out of range input for now
                 {
@@ -114,7 +116,7 @@ namespace MultipleChoiceApp
         public static void DisplayUserFunctionality()
         {
             Console.ForegroundColor = ConsoleColor.DarkGray;
-            Console.WriteLine("Enter an integer value (e.g 1, 2, 3, 4 etc.) to give an answer");
+            Console.WriteLine("Enter an integer value (e.g 1, 2, 3, 4 etc.) to give an answer\n\n");
             Console.ForegroundColor = ConsoleColor.White;
         }
 
@@ -307,26 +309,41 @@ namespace MultipleChoiceApp
         //9
         public static int ViewTests(List<Test> tests)
         {
-            int Response;//Need to return selected test and next menu int
-            Console.WriteLine("Select a test to write by entering the corresponding number");
+            Console.WriteLine("Select a test to write by entering the corresponding number in the brackets");
             for (int i = 0; i < tests.Count; i++)
             {
                 Console.WriteLine("(" + i + ") " + tests[i].GetTestName() + "\n");
             }
-            Response = Convert.ToInt32(Console.ReadLine());
-            return Response;
+            activeTest = Convert.ToInt32(Console.ReadLine());
+            return activeTest;
         }
         
         //10
-        public void ViewOwnMarks()
+        public static void ViewOwnMarks()
         {
 
         }
 
         //11
-        public void TakeSelectedTest()
+        public static void TakeSelectedTest(Test activeTest)
         {
+            Console.Clear();
 
+            Console.WriteLine(activeTest.Author.ReturnInfo());
+            Console.WriteLine("Test Name : " + activeTest.GetTestName());
+
+            List<Question> questions = activeTest.ReturnQuestions();
+
+            for (int i = 0; i < questions.Count; i++)
+            {
+                Console.WriteLine(questions[i].GetQuestionText());
+                Console.WriteLine(questions[i].GetAnswer1Text());
+                Console.WriteLine(questions[i].GetAnswer2Text());
+                Console.WriteLine(questions[i].GetAnswer3Text());
+                Console.WriteLine(questions[i].GetAnswer4Text());
+                DisplayUserFunctionality();
+                Console.ReadLine();
+            }
         }
     }
 }
