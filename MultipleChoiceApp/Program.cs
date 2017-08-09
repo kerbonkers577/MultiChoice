@@ -60,8 +60,7 @@ namespace MultipleChoiceApp
                 }
                 else if(response == 7 && activeTeacher == true)
                 {
-                    teacherforTest = PrepTest();
-                    response = 8;
+                    response = PrepTest();
                 }
                 else if(response == 8 && activeTeacher == true)
                 {
@@ -91,7 +90,7 @@ namespace MultipleChoiceApp
         // and return to previous menu by returning that menu's value
         //---------------------------------
 
-        //Numbering is assigned to method to comply with switch statement
+        //Numbering is assigned to method to comply with if statement
         //All users
         public static void DisplayUserFunctionality()
         {
@@ -128,12 +127,12 @@ namespace MultipleChoiceApp
         }
 
         //7
-        public static Teacher PrepTest()
+        public static int PrepTest()
         {
             Console.Clear();
 
             int makeTest = 8;
-            Teacher aTeacher;
+            
 
             Console.WriteLine("What is your name?:\n");
             string teacher = Console.ReadLine();
@@ -142,9 +141,9 @@ namespace MultipleChoiceApp
             string subject = Console.ReadLine();
 
             tempTeacher = new Teacher(teacher, subject);
-            aTeacher = new Teacher(teacher, subject);
-            return aTeacher;
+            tempTeacher = new Teacher(teacher, subject);
 
+            return makeTest;
         }
 
         //8
