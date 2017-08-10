@@ -9,6 +9,7 @@ namespace MultipleChoiceApp
     class Student : Person
     {
         private string studentNumber;
+        private List<Memo> completedTests = new List<Memo>();
 
         public Student() { }
 
@@ -32,6 +33,11 @@ namespace MultipleChoiceApp
         public string GetStudentNumber()
         {
             return studentNumber;
+        }
+
+        public void addMemoForStudent(Memo memo)
+        {
+            completedTests.Add(memo);
         }
 
     }

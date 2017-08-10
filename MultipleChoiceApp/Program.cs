@@ -12,28 +12,21 @@ namespace MultipleChoiceApp
         private static int activeTest;
 
         static void Main(string[] args)
-        {
-            Console.WriteLine("Welcome to the multiple choice application\nAre you a:\n(1) Teacher\n(2) Student");
-            DisplayUserFunctionality();
-
-            int response = Convert.ToInt32(Console.ReadLine());
+        {            
             Test testToWrite = new Test();
             List<Test> allTests = new List<Test>();
             Student activeStudent = new Student();
-
-            //TODO: Value denoting where in the menu you currently are
-            //E.g. 0 = exit
-            //But depending on the value, it will take you to a specfic switch statement which
-            //will have a static method to show an interface with methods to return to the previous menu
-            //Navigate menu with switch statement wrapped by while loop
-
+            Memo memoToAdd = new Memo();
 
             //To not jump ahead in the menu
             bool loggedInStudent = false;
             bool activeTeacher = false;
 
-            
-            while(response != 0)
+            Console.WriteLine("Welcome to the multiple choice application\nAre you a:\n(1) Teacher\n(2) Student");
+            DisplayUserFunctionality();
+            int response = Convert.ToInt32(Console.ReadLine());
+
+            while (response != 0)
             {
                 if(response == 1)//Teacher
                 {
@@ -75,6 +68,7 @@ namespace MultipleChoiceApp
                 else if(response == 9 && loggedInStudent == true)//Look at test menu
                 {
                     testToWrite = allTests[ViewTests(allTests)];
+                    memoToAdd.AddQuestions(testToWrite.ReturnQuestions());
                     response = 11;
                 }
                 else if(response == 10 && loggedInStudent == true)//Student views marks
@@ -83,7 +77,9 @@ namespace MultipleChoiceApp
                 }
                 else if(response == 11 && loggedInStudent == true)//Student takes selected test
                 {
-                    TakeSelectedTest(testToWrite); 
+                    TakeSelectedTest(testToWrite, memoToAdd);
+                    memoToAdd.DisplayMemo();
+                    Console.ReadLine();
                 }
                 else//Use to circumvent out of range input for now
                 {
@@ -111,9 +107,9 @@ namespace MultipleChoiceApp
         //---------------------------------
 
         //Numbering is assigned to method to comply with if statement
+        
+            
         //All users
-
-
         public static void DisplayUserFunctionality()
         {
             Console.ForegroundColor = ConsoleColor.DarkGray;
@@ -128,7 +124,15 @@ namespace MultipleChoiceApp
             Console.Clear();
             Console.WriteLine("Would you like to:\n(1) Make a new test?\n(2) Review student's marks?");
 
-            int Response = Convert.ToInt16(Console.ReadLine());
+            int Response;
+            bool succeeded = int.TryParse(Console.ReadLine(), out Response);
+            while(succeeded != true)
+            {
+                Console.WriteLine("Please enter an integer value");
+                Console.WriteLine("Would you like to:\n(1) Make a new test?\n(2) Review student's marks?");
+                succeeded = int.TryParse(Console.ReadLine(), out Response);
+            }
+
             switch (Response)
             {
                 case 1:
@@ -326,24 +330,25 @@ namespace MultipleChoiceApp
         }
 
         //11
-        public static void TakeSelectedTest(Test activeTest)
+        public static void TakeSelectedTest(Test activeTest, Memo memoForAdd)
         {
             Console.Clear();
 
-            Console.WriteLine(activeTest.Author.ReturnInfo());
-            Console.WriteLine("Test Name : " + activeTest.GetTestName());
+            Console.WriteLine(activeTest.Author.ReturnInfo() + "\n");
+            Console.WriteLine("Test Name : " + activeTest.GetTestName() + "\n");
 
             List<Question> questions = activeTest.ReturnQuestions();
 
             for (int i = 0; i < questions.Count; i++)
             {
-                Console.WriteLine(questions[i].GetQuestionText());
-                Console.WriteLine(questions[i].GetAnswer1Text());
-                Console.WriteLine(questions[i].GetAnswer2Text());
-                Console.WriteLine(questions[i].GetAnswer3Text());
-                Console.WriteLine(questions[i].GetAnswer4Text());
+                Console.WriteLine("Quesiton - " + questions[i].GetQuestionText());
+                Console.WriteLine("Answer 1 : " + questions[i].GetAnswer1Text());
+                Console.WriteLine("Answer 2 : " + questions[i].GetAnswer2Text());
+                Console.WriteLine("Answer 3 : " + questions[i].GetAnswer3Text());
+                Console.WriteLine("Answer 4 : " + questions[i].GetAnswer4Text());
                 DisplayUserFunctionality();
-                Console.ReadLine();
+                //Add user input check
+                memoForAdd.AddStudentsAnswers(Convert.ToInt32(Console.ReadLine()));
             }
         }
     }
