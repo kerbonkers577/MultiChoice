@@ -24,7 +24,7 @@ namespace MultipleChoiceApp
 
             Console.WriteLine("Welcome to the multiple choice application\nAre you a:\n(1) Teacher\n(2) Student");
             DisplayUserFunctionality();
-            int response = Convert.ToInt32(Console.ReadLine());
+            int response = ValidateRange(Console.ReadLine(), 1, 2);
 
             while (response != 0)
             {
@@ -41,10 +41,6 @@ namespace MultipleChoiceApp
                 else if(response == 3 && loggedInStudent == true)//New Student
                 {
                     response = NewStudentMenu();
-                }
-                else if(response == 4 && loggedInStudent == true)//Existing Student
-                {
-                    ExisitingStudentMenu();
                 }
                 else if(response == 5 && loggedInStudent == true)//Student Interface
                 {
@@ -117,6 +113,31 @@ namespace MultipleChoiceApp
             Console.ForegroundColor = ConsoleColor.White;
         }
 
+        public static int ValidateInput(string userInput)
+        {
+            int input;
+            while (int.TryParse(userInput, out input) == false)
+            {
+                Console.WriteLine("Please enter an integer value (e.g 1, 2)");
+                userInput = Console.ReadLine();
+            }
+
+            return input;
+        }
+
+        public static int ValidateRange(string input, int min, int max)
+        {
+            int validiatedInput;
+            validiatedInput = ValidateInput(input);
+            while(validiatedInput > max || validiatedInput < min)
+            {
+                Console.WriteLine("Input Range out of range");
+                Console.WriteLine("Please enter a menu option within range (Numbers in the brackets are valid options)");
+                validiatedInput = ValidateInput(Console.ReadLine());
+            }
+            return validiatedInput;
+        }
+
         //Teacher
         //1
         public static int DisplayTeacherLoginInterface()
@@ -124,14 +145,11 @@ namespace MultipleChoiceApp
             Console.Clear();
             Console.WriteLine("Would you like to:\n(1) Make a new test?\n(2) Review student's marks?");
 
+            
+
             int Response;
-            bool succeeded = int.TryParse(Console.ReadLine(), out Response);
-            while(succeeded != true)
-            {
-                Console.WriteLine("Please enter an integer value");
-                Console.WriteLine("Would you like to:\n(1) Make a new test?\n(2) Review student's marks?");
-                succeeded = int.TryParse(Console.ReadLine(), out Response);
-            }
+
+            Response = ValidateRange(Console.ReadLine(), 1, 2);
 
             switch (Response)
             {
@@ -141,6 +159,7 @@ namespace MultipleChoiceApp
                 case 2:
                     Response = 6;
                     break;
+                    
             }
 
             return Response;
@@ -180,7 +199,7 @@ namespace MultipleChoiceApp
 
             int numOfQuestions;
             Console.WriteLine("How many questions would you like to add to this test?\n");
-            numOfQuestions = Convert.ToInt32(Console.ReadLine());
+            numOfQuestions = ValidateInput(Console.ReadLine());
 
             Test aTest = new Test();
             aTest.SetTestName(testName);
@@ -230,15 +249,12 @@ namespace MultipleChoiceApp
         public static int DisplayStudentLoginInterface()
         {
             Console.Clear();
-            Console.WriteLine("Are you a(n) :\n(1) New student\n(2) Existing student");
+            Console.WriteLine("Please enter (1) as a new student");
             int Response = Convert.ToInt16(Console.ReadLine());
             switch(Response)
             {
                 case 1:
                     Response = 3;
-                    break;
-                case 2:
-                    Response = 4;
                     break;
             }
 
@@ -248,17 +264,21 @@ namespace MultipleChoiceApp
         public static int NewStudentMenu()
         {
             int Response = 5;
+            Student tempStd = new Student();
             Console.Clear();
             Console.WriteLine("Please enter your student number(0 - 8 digits long):\n");
             try
             {
-                int studentNumber = Convert.ToInt32(Console.ReadLine());
-                string authenticatedStNum = studentNumber + "";
+                string authenticatedStNum = Console.ReadLine();
+                
                 while(authenticatedStNum.Length > 8)
                 {
                     Console.WriteLine("Student Number is not within digit range (0 - 8 digits long)\n Please enter your student number:\n");
                     Console.ReadLine();
+                    authenticatedStNum = Console.ReadLine();
                 }
+
+            
                 
             }
             catch(OverflowException e)
@@ -280,15 +300,6 @@ namespace MultipleChoiceApp
                 Console.ReadKey();
             }
             return Response;
-        }
-        //4
-        public static int ExisitingStudentMenu()
-        {
-            int passSuccessful = 5;//Pass value back if correct login
-            Console.Clear();
-            Console.WriteLine("Please enter your student number to login:\n");
-            //TODO: Go through students for existing students
-            return passSuccessful;
         }
         //5
         public static int DisplayStudentInterface()
@@ -330,7 +341,7 @@ namespace MultipleChoiceApp
         }
 
         //11
-        public static void TakeSelectedTest(Test activeTest, Memo memoForAdd)
+        public static Memo TakeSelectedTest(Test activeTest, Memo memoForAdd)
         {
             Console.Clear();
 
@@ -338,6 +349,7 @@ namespace MultipleChoiceApp
             Console.WriteLine("Test Name : " + activeTest.GetTestName() + "\n");
 
             List<Question> questions = activeTest.ReturnQuestions();
+            memoForAdd.AddQuestions(activeTest.ReturnQuestions());
 
             for (int i = 0; i < questions.Count; i++)
             {
@@ -347,9 +359,10 @@ namespace MultipleChoiceApp
                 Console.WriteLine("Answer 3 : " + questions[i].GetAnswer3Text());
                 Console.WriteLine("Answer 4 : " + questions[i].GetAnswer4Text());
                 DisplayUserFunctionality();
-                //Add user input check
-                memoForAdd.AddStudentsAnswers(Convert.ToInt32(Console.ReadLine()));
+                memoForAdd.AddStudentsAnswers(ValidateInput(Console.ReadLine()));
             }
+
+            return memoForAdd;
         }
     }
 }
