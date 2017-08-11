@@ -14,6 +14,7 @@ namespace MultipleChoiceApp
         List<int> studentAnswers = new List<int>();
         char option;
         int mark;
+        string testName;
 
         public void AddQuestions(List<Question> testQuestions)
         {
@@ -83,6 +84,22 @@ namespace MultipleChoiceApp
             }
             Console.WriteLine("Mark : " + mark);
 
+        }
+
+
+        public string GetTestName()
+        {
+            return testName;
+        }
+
+        public void SetTestName(string testName)
+        {
+            this.testName = testName;
+        }
+
+        public int GetMark()
+        {
+            return mark;
         }
     }
 }

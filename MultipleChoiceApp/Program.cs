@@ -10,21 +10,21 @@ namespace MultipleChoiceApp
     {
         private static Teacher tempTeacher;
         private static int activeTest;
-
+        private static Student tempStd = new Student();
         static void Main(string[] args)
         {            
             Test testToWrite = new Test();
             List<Test> allTests = new List<Test>();
-            Student activeStudent = new Student();
+            
             Memo memoToAdd = new Memo();
 
             //To not jump ahead in the menu
             bool loggedInStudent = false;
             bool activeTeacher = false;
 
-            Console.WriteLine("Welcome to the multiple choice application\nAre you a:\n(1) Teacher\n(2) Student");
+            Console.WriteLine("Welcome to the multiple choice application\nAre you a:\n(1) Teacher\n(2) Student\n Or would you like to:\n(0) Exit");
             DisplayUserFunctionality();
-            int response = ValidateRange(Console.ReadLine(), 1, 2);
+            int response = ValidateRange(Console.ReadLine(), 0, 2);
 
             while (response != 0)
             {
@@ -49,6 +49,15 @@ namespace MultipleChoiceApp
                 else if(response == 6 && activeTeacher == true)//Teacher views student's marks
                 {
                     ViewStudentsMarks();
+                    Console.WriteLine("(1) To return");
+                    int intialresponse = ValidateRange(Console.ReadLine(), 1, 1);
+
+                    switch (intialresponse)
+                    {
+                        case 1:
+                            response = 1;
+                            break;
+                    }
                 }
                 else if(response == 7 && activeTeacher == true)//Prep Test (Author, subject)
                 {
@@ -63,30 +72,57 @@ namespace MultipleChoiceApp
                 }
                 else if(response == 9 && loggedInStudent == true)//Look at test menu
                 {
-                    testToWrite = allTests[ViewTests(allTests)];
-                    memoToAdd.AddQuestions(testToWrite.ReturnQuestions());
-                    response = 11;
+                    if(allTests.Count < 1)
+                    {
+                        Console.WriteLine("No tests currently available\nPress (1) to return");
+                        int intialresponse = ValidateRange(Console.ReadLine(),1,1);
+
+                        switch(intialresponse)
+                        {
+                            case 1:
+                                response = 5;
+                                break;
+                        }
+                    }
+                    else
+                    {
+                        testToWrite = allTests[ViewTests(allTests)];
+                        memoToAdd.AddQuestions(testToWrite.ReturnQuestions());
+                        response = 11;
+                    }
+                    
                 }
                 else if(response == 10 && loggedInStudent == true)//Student views marks
                 {
-                    Console.WriteLine("View marks menu");
+                    ViewOwnMarks();
+                    Console.WriteLine("(1) To return");
+                    int intialresponse = ValidateRange(Console.ReadLine(), 1, 1);
+
+                    switch (intialresponse)
+                    {
+                        case 1:
+                            response = 5;
+                            break;
+                    }
                 }
                 else if(response == 11 && loggedInStudent == true)//Student takes selected test
                 {
-                    TakeSelectedTest(testToWrite, memoToAdd);
+                    tempStd.addMemoForStudent(TakeSelectedTest(testToWrite, memoToAdd));
                     memoToAdd.DisplayMemo();
-                    Console.ReadLine();
+                    //tempStd.addMemoForStudent(memoToAdd);
+                    Console.WriteLine("Press 1 to return to student menu");
+                    response =  ValidateRange(Console.ReadLine(),1,1);
                 }
-                else//Use to circumvent out of range input for now
+                else if (response == 4)
                 {
                     Console.Clear();
-                    Console.WriteLine("Welcome to the multiple choice application\nAre you a:\n(1) Teacher\n(2) Student");
                     loggedInStudent = false;
                     activeTeacher = false;
+                    Console.WriteLine("Welcome to the multiple choice application\nAre you a:\n(1) Teacher\n(2) Student\n Or would you like to: \n(0) Exit");
                     DisplayUserFunctionality();
-
-                    response = Convert.ToInt32(Console.ReadLine());
+                    response = ValidateRange(Console.ReadLine(), 0, 2);
                 }
+                
             }
 
         }
@@ -131,8 +167,8 @@ namespace MultipleChoiceApp
             validiatedInput = ValidateInput(input);
             while(validiatedInput > max || validiatedInput < min)
             {
-                Console.WriteLine("Input Range out of range");
-                Console.WriteLine("Please enter a menu option within range (Numbers in the brackets are valid options)");
+                Console.WriteLine("Input out of range");
+                Console.WriteLine("Please enter a number that is within range \n(If in a menu, the numbers in the brackets)\n(If creating a test, the number of the answer text(Either 1,2,3 or 4))");
                 validiatedInput = ValidateInput(Console.ReadLine());
             }
             return validiatedInput;
@@ -143,21 +179,27 @@ namespace MultipleChoiceApp
         public static int DisplayTeacherLoginInterface()
         {
             Console.Clear();
-            Console.WriteLine("Would you like to:\n(1) Make a new test?\n(2) Review student's marks?");
+            Console.WriteLine("Would you like to:\n(1) Make a new test?\n(2) Review student's marks?\n(3)Return to main menu\n(0) Exit");
 
             
 
             int Response;
 
-            Response = ValidateRange(Console.ReadLine(), 1, 2);
+            Response = ValidateRange(Console.ReadLine(), 0, 3);
 
             switch (Response)
             {
+                case 0:
+                    Response = 0;
+                    break;
                 case 1:
                     Response = 7;
                     break;
                 case 2:
                     Response = 6;
+                    break;
+                case 3:
+                    Response = 4;
                     break;
                     
             }
@@ -168,7 +210,9 @@ namespace MultipleChoiceApp
         //6
         public static void ViewStudentsMarks()
         {
-            //Return student to display
+            Console.Clear();
+            tempStd.GetName();
+            tempStd.ViewMarks();
         }
 
         //7
@@ -214,28 +258,30 @@ namespace MultipleChoiceApp
             for (int i = 0; i < numOfQuestions; i++)
             {
                 //Question
+                Console.ForegroundColor = ConsoleColor.Magenta;
                 Console.WriteLine("Please give the question text for question " + (i+1) + "\n");
+                Console.ForegroundColor = ConsoleColor.White;
                 question = Console.ReadLine();
 
                 //Answer 1 Text
-                Console.WriteLine("Please give the answer text for answer 1\n");
+                Console.WriteLine("\nPlease give the answer text for answer 1\n");
                 answerText1 = Console.ReadLine();
 
                 //Answer 2 Text
-                Console.WriteLine("Please give the answer text for answer 2\n");
+                Console.WriteLine("\nPlease give the answer text for answer 2\n");
                 answerText2 = Console.ReadLine();
 
                 //Answer 3 Text
-                Console.WriteLine("Please give the answer text for answer 3\n");
+                Console.WriteLine("\nPlease give the answer text for answer 3\n");
                 answerText3 = Console.ReadLine();
 
                 //Answer 4 Text
-                Console.WriteLine("Please give the answer text for answer 4\n");
+                Console.WriteLine("\nPlease give the answer text for answer 4\n");
                 answerText4 = Console.ReadLine();
 
                 //Answer integer assignment
-                Console.WriteLine("Please state the correct answer by typing in either 1, 2, 3 or 4\n");
-                actualAnswer = Convert.ToInt16(Console.ReadLine());
+                Console.WriteLine("\nPlease state the correct answer by typing in either 1, 2, 3 or 4\n");
+                actualAnswer = ValidateRange(Console.ReadLine(), 1, 4);
 
                 aQuesation = new Question(question, answerText1, answerText2, answerText3, answerText4, actualAnswer);
                 aTest.AddQuestion(aQuesation);
@@ -249,10 +295,13 @@ namespace MultipleChoiceApp
         public static int DisplayStudentLoginInterface()
         {
             Console.Clear();
-            Console.WriteLine("Please enter (1) as a new student");
-            int Response = Convert.ToInt16(Console.ReadLine());
+            Console.WriteLine("Please enter (1) as a new student\n(0) to Exit");
+            int Response = ValidateRange(Console.ReadLine(), 0, 1);
             switch(Response)
             {
+                case 0:
+                    Response = 0;
+                    break;
                 case 1:
                     Response = 3;
                     break;
@@ -264,7 +313,6 @@ namespace MultipleChoiceApp
         public static int NewStudentMenu()
         {
             int Response = 5;
-            Student tempStd = new Student();
             Console.Clear();
             Console.WriteLine("Please enter your student number(0 - 8 digits long):\n");
             try
@@ -278,7 +326,12 @@ namespace MultipleChoiceApp
                     authenticatedStNum = Console.ReadLine();
                 }
 
-            
+
+                Console.WriteLine("Please enter your name :\n");
+                string name = Console.ReadLine();
+
+                tempStd.SetStudentNumber(authenticatedStNum);
+                tempStd.SetName(name);
                 
             }
             catch(OverflowException e)
@@ -306,16 +359,22 @@ namespace MultipleChoiceApp
         {
             int Response;
             Console.Clear();
-            Console.WriteLine("Would you like to :\n(1) Take a test\n(2) View your marks");
-            Response = Convert.ToInt16(Console.ReadLine());
+            Console.WriteLine("Would you like to :\n(1) Take a test\n(2) View your marks\n(3)Return to main menu\n(0) Exit");
+            Response = ValidateRange(Console.ReadLine(), 0, 3);
 
             switch(Response)
             {
+                case 0:
+                    Response = 0;
+                    break;
                 case 1:
                     Response = 9;
                     break;
                 case 2:
-
+                    Response = 10;
+                    break;
+                case 3:
+                    Response = 4;
                     break;
             }
 
@@ -330,14 +389,18 @@ namespace MultipleChoiceApp
             {
                 Console.WriteLine("(" + i + ") " + tests[i].GetTestName() + "\n");
             }
-            activeTest = Convert.ToInt32(Console.ReadLine());
+
+            activeTest = ValidateRange(Console.ReadLine(), 0, tests.Count);            
+            
             return activeTest;
         }
         
         //10
         public static void ViewOwnMarks()
         {
-
+            Console.Clear();
+            tempStd.GetName();
+            tempStd.ViewMarks();
         }
 
         //11
@@ -353,7 +416,9 @@ namespace MultipleChoiceApp
 
             for (int i = 0; i < questions.Count; i++)
             {
+                Console.ForegroundColor = ConsoleColor.Magenta;
                 Console.WriteLine("Quesiton - " + questions[i].GetQuestionText());
+                Console.ForegroundColor = ConsoleColor.White;
                 Console.WriteLine("Answer 1 : " + questions[i].GetAnswer1Text());
                 Console.WriteLine("Answer 2 : " + questions[i].GetAnswer2Text());
                 Console.WriteLine("Answer 3 : " + questions[i].GetAnswer3Text());

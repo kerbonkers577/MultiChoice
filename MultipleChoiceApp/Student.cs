@@ -25,6 +25,16 @@ namespace MultipleChoiceApp
             return info;
         }
 
+        public void SetName(string name)
+        {
+            this.name = name;
+        }
+
+        public void SetStudentNumber(string studentNumber)
+        {
+            this.studentNumber = studentNumber;
+        }
+
         public string GetName()
         {
             return name;
@@ -40,5 +50,13 @@ namespace MultipleChoiceApp
             completedTests.Add(memo);
         }
 
+        public void ViewMarks()
+        {
+            foreach(Memo memo in completedTests)
+            {
+                memo.GetTestName();
+                memo.GetMark();
+            }
+        }
     }
 }
