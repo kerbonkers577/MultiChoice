@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MultipleChoiceApp
+namespace MultipleChoiceLibrary
 {
-    class Test
+    public class Test
     {
         private Teacher author;
 
