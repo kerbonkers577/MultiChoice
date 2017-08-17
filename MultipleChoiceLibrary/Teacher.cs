@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MultipleChoiceApp
+namespace MultipleChoiceLibrary
 {
-    class Teacher : Person
+    public class Teacher : Person
     {
         private string subject;
 

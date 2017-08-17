@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MultipleChoiceApp
+namespace MultipleChoiceLibrary
 {
-    class Student : Person
+    public class Student : Person
     {
         private string studentNumber;
         private List<Memo> completedTests = new List<Memo>();

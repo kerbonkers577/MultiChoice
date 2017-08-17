@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MultipleChoiceApp
+namespace MultipleChoiceLibrary
 {
-    class Memo
+    public class Memo
     {
         enum options{correct = '\u2713' , incorrect = 'X'};
 

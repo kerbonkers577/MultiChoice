@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MultipleChoiceApp
+namespace MultipleChoiceLibrary
 {
-    abstract class Person
+    public abstract class Person
     {
         protected string name;
         
