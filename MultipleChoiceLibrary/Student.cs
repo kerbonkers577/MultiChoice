@@ -8,6 +8,7 @@ namespace MultipleChoiceLibrary
 {
     public class Student : Person
     {
+        //Stores info regarding to test
         private string studentNumber;
         private List<Memo> completedTests = new List<Memo>();
 
@@ -45,6 +46,8 @@ namespace MultipleChoiceLibrary
             return studentNumber;
         }
 
+
+        //Student can hold multiple memos from completed tests
         public void addMemoForStudent(Memo memo)
         {
             completedTests.Add(memo);

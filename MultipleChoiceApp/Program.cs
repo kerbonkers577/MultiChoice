@@ -25,6 +25,8 @@ namespace MultipleChoiceApp
 
             Console.WriteLine("Welcome to the multiple choice application\nAre you a:\n(1) Teacher\n(2) Student\n Or would you like to:\n(0) Exit");
             DisplayUserFunctionality();
+
+            //Response acts as LCV
             int response = ValidateRange(Console.ReadLine(), 0, 2);
 
             while (response != 0)
@@ -128,19 +130,7 @@ namespace MultipleChoiceApp
 
         }
 
-        //---------------------------------
-        //TODO: Add restrictions to input range
-        //If user inputs 3 with only 1 and 2 as options
-        //bring up warning
-        //---------------------------------
-
-        //---------------------------------
-        //TODO: Use return response to allow user to cancel current functionality
-        // and return to previous menu by returning that menu's value
-        //---------------------------------
-
         //Numbering is assigned to method to comply with if statement
-        
             
         //All users
         public static void DisplayUserFunctionality()
@@ -152,6 +142,8 @@ namespace MultipleChoiceApp
 
         public static int ValidateInput(string userInput)
         {
+            //Validates input through use of out keyword
+            //Allows for checking if the value is actually a number
             int input;
             while (int.TryParse(userInput, out input) == false)
             {
@@ -164,6 +156,7 @@ namespace MultipleChoiceApp
 
         public static int ValidateRange(string input, int min, int max)
         {
+            //Takes validated number and puts it through range check
             int validiatedInput;
             validiatedInput = ValidateInput(input);
             while(validiatedInput > max || validiatedInput < min)
@@ -179,10 +172,9 @@ namespace MultipleChoiceApp
         //1
         public static int DisplayTeacherLoginInterface()
         {
+            //Allows navigation for teachers
             Console.Clear();
             Console.WriteLine("Would you like to:\n(1) Make a new test?\n(2) Review student's marks?\n(3)Return to main menu\n(0) Exit");
-
-            
 
             int Response;
 
@@ -211,6 +203,7 @@ namespace MultipleChoiceApp
         //6
         public static void ViewStudentsMarks()
         {
+            //Display current static student object's details
             Console.Clear();
             tempStd.GetName();
             tempStd.ViewMarks();
@@ -239,6 +232,8 @@ namespace MultipleChoiceApp
         //8
         public static Test MakeTest()
         {
+            //Adds details for test author
+            Console.Clear();
             Console.WriteLine("What is the name of the test?:\n");
             string testName = Console.ReadLine();
 
@@ -250,6 +245,7 @@ namespace MultipleChoiceApp
             aTest.SetTestName(testName);
             Question aQuesation;
 
+            //Cycles through question to add them to the test
             string question = "";
             string answerText1 = "";
             string answerText2 = "";
@@ -295,6 +291,7 @@ namespace MultipleChoiceApp
         //2
         public static int DisplayStudentLoginInterface()
         {
+            //Allows navigation for a student
             Console.Clear();
             Console.WriteLine("Please enter (1) as a new student\n(0) to Exit");
             int Response = ValidateRange(Console.ReadLine(), 0, 1);
@@ -313,6 +310,7 @@ namespace MultipleChoiceApp
         //3
         public static int NewStudentMenu()
         {
+            //Brings up an interface for a student to enter details
             int Response = 5;
             Console.Clear();
             Console.WriteLine("Please enter your student number(0 - 8 digits long):\n");
@@ -358,6 +356,7 @@ namespace MultipleChoiceApp
         //5
         public static int DisplayStudentInterface()
         {
+            //Allows student navigation pass credentials screen
             int Response;
             Console.Clear();
             Console.WriteLine("Would you like to :\n(1) Take a test\n(2) View your marks\n(3)Return to main menu\n(0) Exit");
@@ -385,12 +384,13 @@ namespace MultipleChoiceApp
         //9
         public static int ViewTests(List<Test> tests)
         {
+            //Allows entering of test to write using integer assignment
             Console.WriteLine("Select a test to write by entering the corresponding number in the brackets");
             for (int i = 0; i < tests.Count; i++)
             {
                 Console.WriteLine("(" + i + ") " + tests[i].GetTestName() + "\n");
             }
-
+            //Range check for valid test selection
             activeTest = ValidateRange(Console.ReadLine(), 0, tests.Count);            
             
             return activeTest;
@@ -407,6 +407,7 @@ namespace MultipleChoiceApp
         //11
         public static Memo TakeSelectedTest(Test activeTest, Memo memoForAdd)
         {
+            //Assign memo for student
             Console.Clear();
 
             Console.WriteLine(activeTest.Author.ReturnInfo() + "\n");

@@ -8,6 +8,7 @@ namespace MultipleChoiceLibrary
 {
     public class Test
     {
+        //Test class for saving details of test creator and storing collection of questions with it
         private Teacher author;
 
         public Teacher Author

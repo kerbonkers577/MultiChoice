@@ -8,6 +8,7 @@ namespace MultipleChoiceLibrary
 {
     public abstract class Person
     {
+        //Abstract class that Student and teacher are derived from
         protected string name;
         
 

@@ -8,6 +8,7 @@ namespace MultipleChoiceLibrary
 {
     public class Question
     {
+        //Quesiton holds text and actual int answer for a question for a test
         private string questionText;
         private string answer1;
         private string answer2;

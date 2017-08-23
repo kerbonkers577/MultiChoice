@@ -8,6 +8,7 @@ namespace MultipleChoiceLibrary
 {
     public class Teacher : Person
     {
+        //Stores information regarding to teacher who creates the test
         private string subject;
 
         public Teacher(){ }
@@ -20,7 +21,7 @@ namespace MultipleChoiceLibrary
         public override string ReturnInfo()
         {
             string info;
-            info = String.Format("Name : {0}\nStudent Number : {1}", name, subject);
+            info = String.Format("Name : {0}\nSubject : {1}", name, subject);
             return info;
         }
     }
