@@ -16,7 +16,7 @@ namespace MultipleChoiceApp
         {            
             Test testToWrite = new Test();
             List<Test> allTests = new List<Test>();
-            
+
             Memo memoToAdd = new Memo();
 
             //To not jump ahead in the menu
@@ -51,7 +51,7 @@ namespace MultipleChoiceApp
                 }
                 else if(response == 6 && activeTeacher == true)//Teacher views student's marks
                 {
-                    ViewStudentsMarks();
+                    ViewStudentsMarks(tempStd);
                     Console.WriteLine("(1) To return");
                     int intialresponse = ValidateRange(Console.ReadLine(), 1, 1);
 
@@ -97,7 +97,9 @@ namespace MultipleChoiceApp
                 }
                 else if(response == 10 && loggedInStudent == true)//Student views marks
                 {
-                    ViewOwnMarks();
+                    Student temp = tempStd;
+                    
+                    ViewOwnMarks(tempStd);
                     Console.WriteLine("(1) To return");
                     int intialresponse = ValidateRange(Console.ReadLine(), 1, 1);
 
@@ -115,6 +117,13 @@ namespace MultipleChoiceApp
                     //tempStd.addMemoForStudent(memoToAdd);
                     Console.WriteLine("Press 1 to return to student menu");
                     response =  ValidateRange(Console.ReadLine(),1,1);
+
+                    switch(response)
+                    {
+                        case 1:
+                            response = 5;
+                            break;
+                    }
                 }
                 else if (response == 4)
                 {
@@ -130,13 +139,20 @@ namespace MultipleChoiceApp
 
         }
 
-        //Numbering is assigned to method to comply with if statement
-            
+
+        //---------------------------------------------------------------------------------
+        //---------------------------------------------------------------------------------
+        ////---------------------------------------------------------------------------------
+        //---------------------------------------------------------------------------------
+        //---------------------------------------------------------------------------------
+
+
+        //Numbering is assigned to method to comply with if statement    
         //All users
         public static void DisplayUserFunctionality()
         {
             Console.ForegroundColor = ConsoleColor.DarkGray;
-            Console.WriteLine("Enter an integer value (e.g 1, 2, 3, 4 etc.) to give an answer\n\n");
+            Console.WriteLine("Enter an integer value (e.g 1, 2 etc.) to interact with the program\n\n");
             Console.ForegroundColor = ConsoleColor.White;
         }
 
@@ -174,7 +190,7 @@ namespace MultipleChoiceApp
         {
             //Allows navigation for teachers
             Console.Clear();
-            Console.WriteLine("Would you like to:\n(1) Make a new test?\n(2) Review student's marks?\n(3)Return to main menu\n(0) Exit");
+            Console.WriteLine("Would you like to:\n(1) Make a new test?\n(2) Review student's marks?\n(3) Return to main menu\n(0) Exit");
 
             int Response;
 
@@ -201,12 +217,12 @@ namespace MultipleChoiceApp
         }
         
         //6
-        public static void ViewStudentsMarks()
+        public static void ViewStudentsMarks(dynamic st)
         {
             //Display current static student object's details
             Console.Clear();
-            tempStd.GetName();
-            tempStd.ViewMarks();
+            Console.WriteLine(st.ReturnInfo());
+            st.ViewMarks();
         }
 
         //7
@@ -313,17 +329,12 @@ namespace MultipleChoiceApp
             //Brings up an interface for a student to enter details
             int Response = 5;
             Console.Clear();
-            Console.WriteLine("Please enter your student number(0 - 8 digits long):\n");
+            Console.WriteLine("Please enter your student number(1 - 4 digits long):\n");
             try
             {
                 string authenticatedStNum = Console.ReadLine();
-                
-                while(authenticatedStNum.Length > 8)
-                {
-                    Console.WriteLine("Student Number is not within digit range (0 - 8 digits long)\n Please enter your student number:\n");
-                    Console.ReadLine();
-                    authenticatedStNum = Console.ReadLine();
-                }
+
+                ValidateRange(authenticatedStNum, 1, 9999);
 
 
                 Console.WriteLine("Please enter your name :\n");
@@ -359,7 +370,7 @@ namespace MultipleChoiceApp
             //Allows student navigation pass credentials screen
             int Response;
             Console.Clear();
-            Console.WriteLine("Would you like to :\n(1) Take a test\n(2) View your marks\n(3)Return to main menu\n(0) Exit");
+            Console.WriteLine("Would you like to :\n(1) Take a test\n(2) View your marks\n(3) Return to main menu\n(0) Exit");
             Response = ValidateRange(Console.ReadLine(), 0, 3);
 
             switch(Response)
@@ -397,11 +408,11 @@ namespace MultipleChoiceApp
         }
         
         //10
-        public static void ViewOwnMarks()
+        public static void ViewOwnMarks(dynamic st)
         {
             Console.Clear();
-            tempStd.GetName();
-            tempStd.ViewMarks();
+            Console.WriteLine(st.ReturnInfo());
+            st.ViewMarks();
         }
 
         //11
@@ -410,7 +421,7 @@ namespace MultipleChoiceApp
             //Assign memo for student
             Console.Clear();
 
-            Console.WriteLine(activeTest.Author.ReturnInfo() + "\n");
+            Console.WriteLine("Teacher Information: " + activeTest.Author.ReturnInfo() + "\n");
             Console.WriteLine("Test Name : " + activeTest.GetTestName() + "\n");
 
             List<Question> questions = activeTest.ReturnQuestions();

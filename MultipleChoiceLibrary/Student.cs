@@ -57,9 +57,11 @@ namespace MultipleChoiceLibrary
         {
             foreach(Memo memo in completedTests)
             {
-                memo.GetTestName();
-                memo.GetMark();
+                Console.WriteLine(memo.GetTestName());
+                Console.WriteLine(memo.GetMark());
             }
         }
+
+        ~Student() { }
     }
 }

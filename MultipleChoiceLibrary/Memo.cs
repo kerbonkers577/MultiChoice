@@ -12,8 +12,8 @@ namespace MultipleChoiceLibrary
         //Holds logic for marking a test based on Question objects
         enum options{correct = '\u2713' , incorrect = 'X'};
 
-        List<Question> questions = new List<Question>();
-        List<int> studentAnswers = new List<int>();
+        private List<Question> questions = new List<Question>();
+        private List<int> studentAnswers = new List<int>();
         char option;
         int mark;
         string testName;
@@ -42,7 +42,7 @@ namespace MultipleChoiceLibrary
                 Console.WriteLine("Quesiton - " + questions[i].GetQuestionText());
                 Console.ForegroundColor = ConsoleColor.White;
 
-                
+                //Loops through displaying the question, answer texts, correct answer and the student's answer weighed up against it.
 
                 Console.WriteLine(string.Format("Answer 1: {0}\nAnswer 2: {0}\nAnswer 3: {0}\nAnswer 4: {0}\n", 
                     questions[i].GetAnswer1Text(), questions[i].GetAnswer2Text(), questions[i].GetAnswer3Text(), questions[i].GetAnswer4Text()));
@@ -96,7 +96,7 @@ namespace MultipleChoiceLibrary
                 }
 
             }
-            Console.WriteLine(string.Format("Mark : {0} / {0}", mark, (questions.Count + 1)));
+            Console.WriteLine(string.Format("Mark : {0} / {0}", mark, (questions.Capacity + 1)));
 
         }
 
