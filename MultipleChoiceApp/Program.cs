@@ -112,6 +112,8 @@ namespace MultipleChoiceApp
                 }
                 else if(response == 11 && loggedInStudent == true)//Student takes selected test
                 {
+                    //Change for ADO
+                    //Push through to database
                     tempStd.addMemoForStudent(TakeSelectedTest(testToWrite, memoToAdd));
                     memoToAdd.DisplayMemo();
                     //tempStd.addMemoForStudent(memoToAdd);
@@ -249,15 +251,13 @@ namespace MultipleChoiceApp
             Console.Clear();
 
             int makeTest = 8;
-            
 
             Console.WriteLine("What is your name?:\n");
             string teacher = CheckStringNotNull(Console.ReadLine());
 
             Console.WriteLine("What subject do you teach?:\n");
-            string subject = Console.ReadLine();
+            string subject = CheckStringNotNull(Console.ReadLine());
 
-            tempTeacher = new Teacher(teacher, subject);
             tempTeacher = new Teacher(teacher, subject);
 
             return makeTest;
@@ -269,7 +269,7 @@ namespace MultipleChoiceApp
             //Adds details for test author
             Console.Clear();
             Console.WriteLine("What is the name of the test?:\n");
-            string testName = Console.ReadLine();
+            string testName = CheckStringNotNull(Console.ReadLine());
 
             int numOfQuestions;
             Console.WriteLine("How many questions would you like to add to this test?\n");
@@ -292,23 +292,23 @@ namespace MultipleChoiceApp
                 Console.ForegroundColor = ConsoleColor.Magenta;
                 Console.WriteLine("Please give the question text for question " + (i+1) + "\n");
                 Console.ForegroundColor = ConsoleColor.White;
-                question = Console.ReadLine();
+                question = CheckStringNotNull(Console.ReadLine());
 
                 //Answer 1 Text
                 Console.WriteLine("\nPlease give the answer text for answer 1\n");
-                answerText1 = Console.ReadLine();
+                answerText1 = CheckStringNotNull(Console.ReadLine());
 
                 //Answer 2 Text
                 Console.WriteLine("\nPlease give the answer text for answer 2\n");
-                answerText2 = Console.ReadLine();
+                answerText2 = CheckStringNotNull(Console.ReadLine());
 
                 //Answer 3 Text
                 Console.WriteLine("\nPlease give the answer text for answer 3\n");
-                answerText3 = Console.ReadLine();
+                answerText3 = CheckStringNotNull(Console.ReadLine());
 
                 //Answer 4 Text
                 Console.WriteLine("\nPlease give the answer text for answer 4\n");
-                answerText4 = Console.ReadLine();
+                answerText4 = CheckStringNotNull(Console.ReadLine());
 
                 //Answer integer assignment
                 Console.WriteLine("\nPlease state the correct answer by typing in either 1, 2, 3 or 4\n");
@@ -356,7 +356,7 @@ namespace MultipleChoiceApp
 
 
                 Console.WriteLine("Please enter your name :\n");
-                string name = Console.ReadLine();
+                string name = CheckStringNotNull(Console.ReadLine());
 
                 tempStd.SetStudentNumber(authenticatedStNum);
                 tempStd.SetName(name);
