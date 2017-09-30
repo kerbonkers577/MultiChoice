@@ -142,13 +142,18 @@ namespace MultipleChoiceApp
 
         //---------------------------------------------------------------------------------
         //---------------------------------------------------------------------------------
-        ////---------------------------------------------------------------------------------
+        ////-------------------------------------------------------------------------------
+        
+        //// Menu Functionality
+         
+        ////-------------------------------------------------------------------------------
         //---------------------------------------------------------------------------------
         //---------------------------------------------------------------------------------
 
 
         //Numbering is assigned to method to comply with if statement    
         //All users
+        //// VALIDATION
         public static void DisplayUserFunctionality()
         {
             Console.ForegroundColor = ConsoleColor.DarkGray;
@@ -182,6 +187,19 @@ namespace MultipleChoiceApp
                 validiatedInput = ValidateInput(Console.ReadLine());
             }
             return validiatedInput;
+        }
+
+        public static string CheckStringNotNull(string toValidate)
+        {
+            while(String.IsNullOrEmpty(toValidate) == true)
+            {
+                Console.WriteLine("Input cannot be empty");
+                Console.WriteLine("Please input something");
+                toValidate = Console.ReadLine();
+            }
+
+            return toValidate;
+
         }
 
         //Teacher
@@ -234,7 +252,7 @@ namespace MultipleChoiceApp
             
 
             Console.WriteLine("What is your name?:\n");
-            string teacher = Console.ReadLine();
+            string teacher = CheckStringNotNull(Console.ReadLine());
 
             Console.WriteLine("What subject do you teach?:\n");
             string subject = Console.ReadLine();
