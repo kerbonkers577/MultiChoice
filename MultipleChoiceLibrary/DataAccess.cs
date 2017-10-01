@@ -10,6 +10,12 @@ namespace MultipleChoiceLibrary
 {
     class DataAccess
     {
+        //Database connection testing method
+
+        public void TestConnection()
+        {
+
+        }
         //Student table access
         //StudentAnswer table access
         //Question table access

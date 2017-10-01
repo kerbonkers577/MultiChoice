@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using MultipleChoiceLibrary;
 
@@ -22,6 +23,9 @@ namespace MultipleChoiceApp
             //To not jump ahead in the menu
             bool loggedInStudent = false;
             bool activeTeacher = false;
+
+            //Thread test
+            Thread data = new Thread();
 
             Console.WriteLine("Welcome to the multiple choice application\nAre you a:\n(1) Teacher\n(2) Student\n Or would you like to:\n(0) Exit");
             DisplayUserFunctionality();
