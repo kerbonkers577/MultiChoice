@@ -10,12 +10,27 @@ namespace MultipleChoiceLibrary
 {
     class DataAccess
     {
+
+        
+        
         //Database connection testing method
-
-        public void TestConnection()
+        public void TestConnection(string connectionString, SqlConnection dbConn)
         {
-
+            try
+            {
+                dbConn = new SqlConnection(connectionString);
+                dbConn.Open();
+                Console.WriteLine("Database connection established");
+                Console.ReadKey();
+                dbConn.Close();
+            }
+            catch(SqlException e)
+            {
+                Console.WriteLine("SQL connection failed " + e.Message);
+            }
         }
+
+
         //Student table access
         //StudentAnswer table access
         //Question table access

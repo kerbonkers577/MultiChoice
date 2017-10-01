@@ -13,6 +13,7 @@ namespace MultipleChoiceApp
         private static Teacher tempTeacher;
         private static int activeTest;
         private static Student tempStd = new Student();
+        //private static DataAcces
         static void Main(string[] args)
         {            
             Test testToWrite = new Test();
@@ -463,6 +464,11 @@ namespace MultipleChoiceApp
             }
 
             return memoForAdd;
+        }
+
+        public async static void DataAccessTest()
+        {
+            await 
         }
     }
 }
