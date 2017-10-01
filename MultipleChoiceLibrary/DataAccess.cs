@@ -10,9 +10,6 @@ namespace MultipleChoiceLibrary
 {
     class DataAccess
     {
-
-        
-        
         //Database connection testing method
         public void TestConnection(string connectionString, SqlConnection dbConn)
         {
@@ -24,7 +21,7 @@ namespace MultipleChoiceLibrary
                 Console.ReadKey();
                 dbConn.Close();
             }
-            catch(SqlException e)
+            catch (SqlException e)
             {
                 Console.WriteLine("SQL connection failed " + e.Message);
             }

@@ -13,7 +13,9 @@ namespace MultipleChoiceApp
         private static Teacher tempTeacher;
         private static int activeTest;
         private static Student tempStd = new Student();
-        //private static DataAcces
+        private static DataAccess 
+
+
         static void Main(string[] args)
         {            
             Test testToWrite = new Test();
