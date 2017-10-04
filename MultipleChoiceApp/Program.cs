@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Data;
+using System.Data.SqlClient;
 using MultipleChoiceLibrary;
 
 namespace MultipleChoiceApp
@@ -13,14 +15,15 @@ namespace MultipleChoiceApp
         private static Teacher tempTeacher;
         private static int activeTest;
         private static Student tempStd = new Student();
-        private static DataAccess 
-
+        private static DataAccess data = new DataAccess();
+        private static SqlConnection dbConn;
+        private static string connectionString = Properties.Settings.Default.ConnectionString;
 
         static void Main(string[] args)
         {            
             Test testToWrite = new Test();
             List<Test> allTests = new List<Test>();
-
+            
             Memo memoToAdd = new Memo();
 
             //To not jump ahead in the menu
@@ -28,7 +31,9 @@ namespace MultipleChoiceApp
             bool activeTeacher = false;
 
             //Thread test
-            Thread data = new Thread();
+            Thread data = new Thread(DataAccessTest);
+            data.Start();
+            
 
             Console.WriteLine("Welcome to the multiple choice application\nAre you a:\n(1) Teacher\n(2) Student\n Or would you like to:\n(0) Exit");
             DisplayUserFunctionality();
@@ -468,9 +473,9 @@ namespace MultipleChoiceApp
             return memoForAdd;
         }
 
-        public async static void DataAccessTest()
+        public static void DataAccessTest()
         {
-            await 
+            string message = data.TestConnection(connectionString, dbConn);
         }
     }
 }
