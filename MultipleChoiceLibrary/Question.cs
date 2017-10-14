@@ -16,6 +16,8 @@ namespace MultipleChoiceLibrary
         private string answer4;
         private int actualAnswer;
 
+        public Question() { }
+
         public Question(string questionText, string answer1, string answer2, string answer3, string answer4, int actualAnswer)
         {
             //Create Singular Question for test

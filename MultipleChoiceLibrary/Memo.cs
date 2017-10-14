@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Data;
+using System.Data.SqlClient;
 
 namespace MultipleChoiceLibrary
 {
@@ -12,83 +14,112 @@ namespace MultipleChoiceLibrary
         //Holds logic for marking a test based on Question objects
         enum options{correct = '\u2713' , incorrect = 'X'};
 
-        private List<Question> questions = new List<Question>();
+        private DataAccess data = new DataAccess();
         private List<int> studentAnswers = new List<int>();
         char option;
         int mark;
         string testName;
 
-        public void AddQuestions(List<Question> testQuestions)
-        {
-            questions = testQuestions;
-        }
+        
 
         public void AddStudentsAnswers(int answer)
         {
             studentAnswers.Add(answer);
         }
 
-        public void DisplayMemo()
+        public void DisplayMemo(SqlConnection dbConn, int studentID, int testID)
         {
             Console.Clear();
+
+            DataSet QA = data.GetStudentQuestionAnswers(dbConn, studentID);
+            DataSet Questions = data.GetSpecificTestQuestions(dbConn, testID);
+
+            int count;
+            object[] QARow;
+            object[] QRow;
+
             //Banner
             Console.WriteLine("------------------------------------------------");
             Console.WriteLine("                     M E M O                     ");
             Console.WriteLine("------------------------------------------------");
 
-            for (int i = 0; i < questions.Count; i++)
+            List<int> StudentsAnswers = new List<int>();
+            Question tempQuestion = new Question();
+
+            count = Questions.Tables[0].Rows.Count;
+
+            for (int i = 0; i < count; i++)
             {
+                QRow = Questions.Tables[0].Rows[i].ItemArray;
+                QARow = QA.Tables[0].Rows[i].ItemArray;
+
+                //Quesitons list population
+                //tempQuestion = new Question((QRow[2] + ""), (QRow[3] + ""),
+                //        (QRow[4] + ""), (QRow[5] + ""), (QRow[6] + ""), Convert.ToInt16(QRow[7]));
+
+
+                tempQuestion.SetQuestionText(QRow[2] + "");
+                tempQuestion.SetAnswer1Text(QRow[3] + "");
+                tempQuestion.SetAnswer2Text(QRow[4] + "");
+                tempQuestion.SetAnswer3Text(QRow[5] + "");
+                tempQuestion.SetAnswer4Text(QRow[6] + "");
+
+                //StudentAnswers list population
+                StudentsAnswers = StudentsAnswers = new List<int>();
+                StudentsAnswers.Add(Convert.ToInt16(QARow[1]));
+                StudentsAnswers.Add(Convert.ToInt16(QARow[3]));
+                
+
+
                 Console.ForegroundColor = ConsoleColor.Magenta;
-                Console.WriteLine("Quesiton - " + questions[i].GetQuestionText());
+                Console.WriteLine("Quesiton - " + tempQuestion.GetQuestionText());
                 Console.ForegroundColor = ConsoleColor.White;
 
                 //Loops through displaying the question, answer texts, correct answer and the student's answer weighed up against it.
 
-                Console.WriteLine(string.Format("Answer 1: {0}\nAnswer 2: {0}\nAnswer 3: {0}\nAnswer 4: {0}\n", 
-                    questions[i].GetAnswer1Text(), questions[i].GetAnswer2Text(), questions[i].GetAnswer3Text(), questions[i].GetAnswer4Text()));
+                Console.WriteLine(string.Format("Answer 1: {0}\nAnswer 2: {1}\nAnswer 3: {2}\nAnswer 4: {3}\n",
+                    tempQuestion.GetAnswer1Text(), tempQuestion.GetAnswer2Text(), tempQuestion.GetAnswer3Text(), tempQuestion.GetAnswer4Text()));
 
 
-                switch (questions[i].GetActualAnswer())
+                switch (StudentsAnswers[1])
                 {
                     case 1:
-                        Console.WriteLine("Correct Answer : " + questions[i].GetAnswer1Text());
+                        Console.WriteLine("Correct Answer : " + tempQuestion.GetAnswer1Text());
                         break;
                     case 2:
-                        Console.WriteLine("Correct Answer : " + questions[i].GetAnswer2Text());
+                        Console.WriteLine("Correct Answer : " + tempQuestion.GetAnswer2Text());
                         break;
                     case 3:
-                        Console.WriteLine("Correct Answer : " + questions[i].GetAnswer3Text());
+                        Console.WriteLine("Correct Answer : " + tempQuestion.GetAnswer3Text());
                         break;
                     case 4:
-                        Console.WriteLine("Correct Answer : " + questions[i].GetAnswer4Text());
+                        Console.WriteLine("Correct Answer : " + tempQuestion.GetAnswer4Text());
                         break;
                 }
 
-                switch (studentAnswers[i])
+                switch (StudentsAnswers[0])
                 {
                     case 1:
-                        Console.WriteLine("Student's Answer : " + questions[i].GetAnswer1Text());
+                        Console.WriteLine("Student's Answer : " + tempQuestion.GetAnswer1Text());
                         break;
                     case 2:
-                        Console.WriteLine("Student's Answer : " + questions[i].GetAnswer2Text());
+                        Console.WriteLine("Student's Answer : " + tempQuestion.GetAnswer2Text());
                         break;
                     case 3:
-                        Console.WriteLine("Student's Answer : " + questions[i].GetAnswer3Text());
+                        Console.WriteLine("Student's Answer : " + tempQuestion.GetAnswer3Text());
                         break;
                     case 4:
-                        Console.WriteLine("Student's Answer : " + questions[i].GetAnswer4Text());
+                        Console.WriteLine("Student's Answer : " + tempQuestion.GetAnswer4Text());
                         break;
                 }
 
-                if (questions[i].GetActualAnswer() == studentAnswers[i])
+                if (StudentsAnswers[0] == StudentsAnswers[1])
                 {
                     Console.ForegroundColor = ConsoleColor.Green;
                     Console.WriteLine((option = (char)options.correct) + "\n");
                     Console.ForegroundColor = ConsoleColor.White;
-                    mark++;
                 }
-
-                if (questions[i].GetActualAnswer() != studentAnswers[i])
+                else if (StudentsAnswers[0] != StudentsAnswers[1])
                 {
                     Console.ForegroundColor = ConsoleColor.Red;
                     Console.WriteLine((option = (char)options.incorrect) + "\n");
@@ -96,7 +127,10 @@ namespace MultipleChoiceLibrary
                 }
 
             }
-            Console.WriteLine(string.Format("Mark : {0} / {0}", mark, (questions.Capacity + 1)));
+
+            int mark = data.CalculateStudentsMark(dbConn, studentID);
+            data.InsertMark(dbConn, studentID, testID, mark);
+            Console.WriteLine(string.Format("Mark : {0} / {1}", mark, count));
 
         }
 

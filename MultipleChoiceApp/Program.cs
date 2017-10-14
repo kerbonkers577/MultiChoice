@@ -16,8 +16,7 @@ namespace MultipleChoiceApp
         private static int activeTest;
         private static Student tempStd = new Student();
         private static DataAccess data = new DataAccess();
-        private static SqlConnection dbConn;
-        private static string connectionString = Properties.Settings.Default.ConnectionString;
+        
 
         static void Main(string[] args)
         {            
@@ -30,10 +29,13 @@ namespace MultipleChoiceApp
             bool loggedInStudent = false;
             bool activeTeacher = false;
 
-            //Thread test
-            Thread data = new Thread(DataAccessTest);
-            data.Start();
-            
+            //TestIDTemp for test selects
+            int testSelect = 0;
+
+            SqlConnection dbConn = new SqlConnection();
+            string connectionString = Properties.Settings.Default.ConnectionString;
+
+            dbConn = DataAccessTest(connectionString, dbConn);
 
             Console.WriteLine("Welcome to the multiple choice application\nAre you a:\n(1) Teacher\n(2) Student\n Or would you like to:\n(0) Exit");
             DisplayUserFunctionality();
@@ -45,25 +47,32 @@ namespace MultipleChoiceApp
             {
                 if(response == 1)//Teacher
                 {
-                    response = DisplayTeacherLoginInterface();
+                    response = Convert.ToInt16(DisplayTeacherInterfaceAsync());
                     activeTeacher = true;
                 }
                 else if(response == 2)//Student
                 {
-                    response = DisplayStudentLoginInterface();
+                    Console.WriteLine(String.Format(
+                        "{0}\n{1}\n{2}\n", "----------------------", "Student", "----------------------\n"));
+                    response = Convert.ToInt16(DisplayStudentLoginInterface());
                     loggedInStudent = true;
                 }
                 else if(response == 3 && loggedInStudent == true)//New Student
                 {
-                    response = NewStudentMenu();
+                    Console.WriteLine(String.Format(
+                        "{0}\n{1}\n{2}\n", "----------------------", "Student", "----------------------\n"));
+                    response = NewStudentMenu(dbConn);
                 }
                 else if(response == 5 && loggedInStudent == true)//Student Interface
                 {
+                    Console.WriteLine(String.Format(
+                        "{0}\n{1}\n{2}\n", "----------------------", "Student", "----------------------\n"));
                     response = DisplayStudentInterface();
                 }
                 else if(response == 6 && activeTeacher == true)//Teacher views student's marks
                 {
-                    ViewStudentsMarks(tempStd);
+                    ViewStudentsMarks(dbConn);
+
                     Console.WriteLine("(1) To return");
                     int intialresponse = ValidateRange(Console.ReadLine(), 1, 1);
 
@@ -76,18 +85,18 @@ namespace MultipleChoiceApp
                 }
                 else if(response == 7 && activeTeacher == true)//Prep Test (Author, subject)
                 {
-                    response = PrepTest();
+                    tempTeacher = PrepTest(dbConn);
+                    response = 8;
+                    
                 }
                 else if(response == 8 && activeTeacher == true)//Make the multiple choice question
                 {
-                    testToWrite = MakeTest();
-                    testToWrite.Author = tempTeacher;
-                    allTests.Add(testToWrite);
+                    MakeTest(dbConn, tempTeacher);
                     response = 1;
                 }
                 else if(response == 9 && loggedInStudent == true)//Look at test menu
-                {
-                    if(allTests.Count < 1)
+                { 
+                    if(ViewTests(dbConn) == null)
                     {
                         Console.WriteLine("No tests currently available\nPress (1) to return");
                         int intialresponse = ValidateRange(Console.ReadLine(),1,1);
@@ -101,17 +110,40 @@ namespace MultipleChoiceApp
                     }
                     else
                     {
-                        testToWrite = allTests[ViewTests(allTests)];
-                        memoToAdd.AddQuestions(testToWrite.ReturnQuestions());
+                        List<string> testNames = new List<string>();
+                        DataSet tempTests = ViewTests(dbConn);
+                        int maxCount = 1;
+
+                        Console.WriteLine(String.Format(
+                        "{0}\n{1}\n{2}\n", "----------------------", "Tests", "----------------------"));
+
+                        object[] row;
+
+                        for (int i = 0; i < tempTests.Tables[0].Rows.Count; i++)
+                        {
+                            //Loops through arrays as rows so it resets index
+                            row = tempTests.Tables[0].Rows[i].ItemArray;
+                            testNames.Add("" + row[1]);
+                            maxCount++;
+                        }
+
+                        for (int i = 0; i < tempTests.Tables[0].Rows.Count; i++)
+                        {
+                            Console.WriteLine(string.Format("({0}) {1}", i + 1, testNames[i]));
+                        }
+                        
+
+                        Console.WriteLine("\nEnter Number by entering corresponding number in brackets");
+                        testSelect = ValidateRange(Console.ReadLine(), 1, (maxCount));
+                        dbConn.Close();
                         response = 11;
                     }
                     
                 }
                 else if(response == 10 && loggedInStudent == true)//Student views marks
                 {
-                    Student temp = tempStd;
-                    
-                    ViewOwnMarks(tempStd);
+                    //Student obj passed through to view own marks
+                    ViewOwnMarks(tempStd, dbConn);
                     Console.WriteLine("(1) To return");
                     int intialresponse = ValidateRange(Console.ReadLine(), 1, 1);
 
@@ -126,9 +158,12 @@ namespace MultipleChoiceApp
                 {
                     //Change for ADO
                     //Push through to database
-                    tempStd.addMemoForStudent(TakeSelectedTest(testToWrite, memoToAdd));
-                    memoToAdd.DisplayMemo();
-                    //tempStd.addMemoForStudent(memoToAdd);
+                    int testID = TakeSelectedTest(dbConn, testSelect);
+
+                    //TODO:
+                    //DisplayMemo
+                    memoToAdd.DisplayMemo(dbConn, Convert.ToInt16(tempStd.GetID()), testID);
+
                     Console.WriteLine("Press 1 to return to student menu");
                     response =  ValidateRange(Console.ReadLine(),1,1);
 
@@ -147,6 +182,66 @@ namespace MultipleChoiceApp
                     Console.WriteLine("Welcome to the multiple choice application\nAre you a:\n(1) Teacher\n(2) Student\n Or would you like to: \n(0) Exit");
                     DisplayUserFunctionality();
                     response = ValidateRange(Console.ReadLine(), 0, 2);
+                }
+                else if(response == 12)//Student Login Added in assignment 3, hence weird number allocation
+                {
+                    int exitResponse = 0;
+
+                    Console.Clear();
+                    Console.WriteLine("Please enter your student number : ");
+                    string num = CheckStringNotNull(Console.ReadLine());
+                    Console.WriteLine("Please enter your password : ");
+                    string password = CheckStringNotNull(Console.ReadLine());
+
+                    bool validResponse = ExistingStudentMenu(dbConn, num, password);
+
+                    while (exitResponse != 1 && validResponse == false)
+                    {
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.WriteLine("Invalid Credentials");
+                        Console.ForegroundColor = ConsoleColor.White;
+                        Console.WriteLine("Would you like to return to the main menu or try again?\n(1) To return to main menu\n(0) To Retry");
+                        //Short circuts and exits
+                        exitResponse = ValidateRange(Console.ReadLine(),0,1);
+
+                        if (exitResponse == 0)
+                        {
+                            Console.Clear();
+                            Console.WriteLine("Please enter your student number : ");
+                            num = CheckStringNotNull(Console.ReadLine());
+                            Console.WriteLine("Please enter your password : ");
+                            password = CheckStringNotNull(Console.ReadLine());
+                            validResponse = ExistingStudentMenu(dbConn, num, password);
+                        }
+                    }
+
+                    DataSet loggedStudent;
+
+                    if(exitResponse == 0)
+                    {
+                        response = 5;
+                        //TODO: Set the static student obj as the returned results
+                        loggedStudent = data.GetSpecificStudent(dbConn, num);
+
+                        //Loops through arrays as rows so it resets index
+                        object[] row = loggedStudent.Tables[0].Rows[0].ItemArray;
+
+                        for (int j = 0; j < row.Length; j++)
+                        {
+                            tempStd.SetID("" + row[0]);
+                            tempStd.SetName("" + row[1]);
+                            tempStd.SetStudentNumber("" + row[2]);
+                            tempStd.SetPassword("" + row[3]);
+                        }
+
+                        
+
+
+                    }
+                    else
+                    {
+                        response = 4;
+                    }
                 }
                 
             }
@@ -203,8 +298,9 @@ namespace MultipleChoiceApp
             return validiatedInput;
         }
 
-        public static string CheckStringNotNull(string toValidate)
+        public static string CheckStringNotNull(dynamic toValidate)
         {
+            toValidate = Convert.ToString(toValidate);
             while(String.IsNullOrEmpty(toValidate) == true)
             {
                 Console.WriteLine("Input cannot be empty");
@@ -218,10 +314,18 @@ namespace MultipleChoiceApp
 
         //Teacher
         //1
+
+        public static async Task<int> DisplayTeacherInterfaceAsync()
+        {
+            return await Task.Run(() => DisplayTeacherLoginInterface());
+        }
+
         public static int DisplayTeacherLoginInterface()
         {
             //Allows navigation for teachers
             Console.Clear();
+            Console.WriteLine(String.Format(
+                "{0}\n{1}\n{2}", "----------------------", "Teacher's Options", "----------------------"));
             Console.WriteLine("Would you like to:\n(1) Make a new test?\n(2) Review student's marks?\n(3) Return to main menu\n(0) Exit");
 
             int Response;
@@ -247,22 +351,43 @@ namespace MultipleChoiceApp
 
             return Response;
         }
-        
-        //6
-        public static void ViewStudentsMarks(dynamic st)
+
+        //6 Display Marks for teacher
+        public static DataSet ViewStudentsMarks(SqlConnection dbConn)
         {
-            //Display current static student object's details
+            DataSet marks;
+            //Display all marks through db
+            marks = data.GetStudentMarkTable(dbConn);
+
             Console.Clear();
-            Console.WriteLine(st.ReturnInfo());
-            st.ViewMarks();
+
+            List<string> studentName = new List<string>();
+            List<string> testName = new List<string>();
+            List<string> studentMark = new List<string>();
+
+            Console.WriteLine(String.Format(
+                "{0}\n{1}\n{2}", "----------------------", "Student's Marks", "----------------------"));
+
+            for (int i = 0; i < marks.Tables[0].Rows.Count; i++)
+            {
+                //Loops through arrays as rows so it resets index
+                object[] row = marks.Tables[0].Rows[i].ItemArray;
+
+                studentName.Add("" + row[0]);
+                testName.Add("" + row[1]);
+                studentMark.Add("" + row[2]);
+
+                Console.WriteLine(string.Format("Student Name: {0}\nStudent Number{1,5}, \nStudent's Mark:{2,5}", studentName[i],
+                                testName[i], studentMark[i]));
+            }
+            Console.WriteLine();
+            return marks;
         }
 
         //7
-        public static int PrepTest()
+        public static Teacher PrepTest(SqlConnection dbConn)
         {
             Console.Clear();
-
-            int makeTest = 8;
 
             Console.WriteLine("What is your name?:\n");
             string teacher = CheckStringNotNull(Console.ReadLine());
@@ -270,13 +395,22 @@ namespace MultipleChoiceApp
             Console.WriteLine("What subject do you teach?:\n");
             string subject = CheckStringNotNull(Console.ReadLine());
 
-            tempTeacher = new Teacher(teacher, subject);
+            DataSet teacherForTest = data.PrepTest(dbConn, teacher, subject);
+            Teacher testTeacher = new Teacher();
 
-            return makeTest;
+            for (int i = 0; i < teacherForTest.Tables[0].Rows.Count; i++)
+            {
+                object[] row = teacherForTest.Tables[0].Rows[i].ItemArray;
+                testTeacher.SetID(row[0] + "");
+                testTeacher.SetName(row[1] + "");
+                testTeacher.SetSubject(row[2] + "");   
+            }
+
+            return testTeacher;
         }
 
         //8
-        public static Test MakeTest()
+        public static void MakeTest(SqlConnection dbConn, Teacher teacher)
         {
             //Adds details for test author
             Console.Clear();
@@ -287,9 +421,9 @@ namespace MultipleChoiceApp
             Console.WriteLine("How many questions would you like to add to this test?\n");
             numOfQuestions = ValidateInput(Console.ReadLine());
 
-            Test aTest = new Test();
-            aTest.SetTestName(testName);
-            Question aQuesation;
+            int testID = data.InsertIntoTests(dbConn, teacher.GetTeacherID(), testName, numOfQuestions);
+
+            
 
             //Cycles through question to add them to the test
             string question = "";
@@ -297,12 +431,14 @@ namespace MultipleChoiceApp
             string answerText2 = "";
             string answerText3 = "";
             string answerText4 = "";
-            int actualAnswer;
-            for (int i = 0; i < numOfQuestions; i++)
+            string actualAnswer = "";
+
+            int i = 0;
+            for (i = 0; i < numOfQuestions; i++)
             {
                 //Question
                 Console.ForegroundColor = ConsoleColor.Magenta;
-                Console.WriteLine("Please give the question text for question " + (i+1) + "\n");
+                Console.WriteLine("Please give the question text for question " + (i + 1) + "\n");
                 Console.ForegroundColor = ConsoleColor.White;
                 question = CheckStringNotNull(Console.ReadLine());
 
@@ -324,23 +460,30 @@ namespace MultipleChoiceApp
 
                 //Answer integer assignment
                 Console.WriteLine("\nPlease state the correct answer by typing in either 1, 2, 3 or 4\n");
-                actualAnswer = ValidateRange(Console.ReadLine(), 1, 4);
+                actualAnswer = Convert.ToString(ValidateRange(CheckStringNotNull(Console.ReadLine()), 1, 4));
 
-                aQuesation = new Question(question, answerText1, answerText2, answerText3, answerText4, actualAnswer);
-                aTest.AddQuestion(aQuesation);
+                data.InsertQuestion(dbConn, testID, question, answerText1, answerText2, answerText3, answerText4, actualAnswer);
             }
-            return aTest;
         }
+
+            
          
 
         //Student
         //2
+        public static async Task<int> DisplayStudentLoginInterfaceASync()
+        {
+            return await Task.Run(() => DisplayStudentLoginInterface());
+        }
+
         public static int DisplayStudentLoginInterface()
         {
             //Allows navigation for a student
             Console.Clear();
-            Console.WriteLine("Please enter (1) as a new student\n(0) to Exit");
-            int Response = ValidateRange(Console.ReadLine(), 0, 1);
+            Console.WriteLine(String.Format(
+                        "{0}\n{1}\n{2}\n", "----------------------", "Student", "----------------------"));
+            Console.WriteLine("Please enter (1) as a new student\nPlease enter (2) as existing student\n(0) to Exit");
+            int Response = ValidateRange(Console.ReadLine(), 0, 2);
             switch(Response)
             {
                 case 0:
@@ -349,12 +492,15 @@ namespace MultipleChoiceApp
                 case 1:
                     Response = 3;
                     break;
+                case 2:
+                    Response = 12;
+                    break;
             }
 
             return Response;
         }
-        //3
-        public static int NewStudentMenu()
+        //3 New Students
+        public static int NewStudentMenu(SqlConnection dbConn)
         {
             //Brings up an interface for a student to enter details
             int Response = 5;
@@ -369,6 +515,14 @@ namespace MultipleChoiceApp
 
                 Console.WriteLine("Please enter your name :\n");
                 string name = CheckStringNotNull(Console.ReadLine());
+
+                Console.WriteLine("Please enter a password :\n");
+                string password = CheckStringNotNull(Console.ReadLine());
+
+                //TODO:
+                //Add new student insert
+
+                data.InsertNewStudent(dbConn, name, authenticatedStNum, password);
 
                 tempStd.SetStudentNumber(authenticatedStNum);
                 tempStd.SetName(name);
@@ -394,12 +548,27 @@ namespace MultipleChoiceApp
             }
             return Response;
         }
+
+        public static bool ExistingStudentMenu(SqlConnection dbconn, string studentNum, string studentPassword)
+        {
+            bool correct = false;
+
+            if (data.CheckSpecificStudentLogin(dbconn, studentNum, studentPassword) == true)
+            {
+                correct = true;
+            }
+
+            return correct;
+        }
         //5
         public static int DisplayStudentInterface()
         {
             //Allows student navigation pass credentials screen
             int Response;
             Console.Clear();
+            Console.WriteLine(String.Format(
+                "{0}\n{1}\n{2}", "----------------------", "Student's Options", "----------------------"));
+
             Console.WriteLine("Would you like to :\n(1) Take a test\n(2) View your marks\n(3) Return to main menu\n(0) Exit");
             Response = ValidateRange(Console.ReadLine(), 0, 3);
 
@@ -422,60 +591,124 @@ namespace MultipleChoiceApp
             return Response;
         }
 
-        //9
-        public static int ViewTests(List<Test> tests)
+        //9 Student Views Marks
+        public static DataSet ViewTests(SqlConnection dbconn)
         {
-            //Allows entering of test to write using integer assignment
-            Console.WriteLine("Select a test to write by entering the corresponding number in the brackets");
-            for (int i = 0; i < tests.Count; i++)
-            {
-                Console.WriteLine("(" + i + ") " + tests[i].GetTestName() + "\n");
-            }
-            //Range check for valid test selection
-            activeTest = ValidateRange(Console.ReadLine(), 0, tests.Count);            
+            DataSet marks;
+            //Display all marks through db
+            marks = data.GetTestTable(dbconn);
+            return marks;
             
-            return activeTest;
         }
         
         //10
-        public static void ViewOwnMarks(dynamic st)
+        public static void ViewOwnMarks(Student st, SqlConnection dbConn)
         {
+            DataSet marks;
+            //Display all marks through db
+            marks = data.GetStudentMark(dbConn, st.GetStudentNumber());
             Console.Clear();
-            Console.WriteLine(st.ReturnInfo());
-            st.ViewMarks();
+
+
+            List<string> studentName = new List<string>();
+            List<string> testName = new List<string>();
+            List<string> studentMark = new List<string>();
+
+            Console.WriteLine(String.Format(
+                "{0}\n{1}\n{2}", "----------------------", "Student's Marks", "----------------------"));
+
+            for (int i = 0; i < marks.Tables[0].Rows.Count; i++)
+            {
+                //Loops through arrays as rows so it resets index
+                object[] row = marks.Tables[0].Rows[i].ItemArray;
+
+                for (int j = 0; j < row.Length; j++)
+                {
+                    studentName.Add("" + row[0]);
+                    testName.Add("" + row[1]);
+                    studentMark.Add("" + row[2]);
+                }
+                Console.WriteLine(string.Format("Student Name: {0}\nStudent Number{1,5}, \nStudent's Mark:{2,5}", studentName[i],
+                                testName[i], studentMark[i]));
+            }
+            Console.WriteLine();
         }
 
         //11
-        public static Memo TakeSelectedTest(Test activeTest, Memo memoForAdd)
+        public static int TakeSelectedTest(SqlConnection dbConn, int testSelect)
         {
-            //Assign memo for student
             Console.Clear();
+            //Test Details
+            DataSet activeTest = new DataSet();
+            
+            activeTest = data.GetSpecificTest(dbConn, testSelect);
+            List<int> testID = new List<int>();
+            List<string> testNames = new List<string>();
+            List<int> testCount = new List<int>();
+            List<int> teacherID = new List<int>();
+            object[] row;
 
-            Console.WriteLine("Teacher Information: " + activeTest.Author.ReturnInfo() + "\n");
-            Console.WriteLine("Test Name : " + activeTest.GetTestName() + "\n");
-
-            List<Question> questions = activeTest.ReturnQuestions();
-            memoForAdd.AddQuestions(activeTest.ReturnQuestions());
-
-            for (int i = 0; i < questions.Count; i++)
+            for (int i = 0; i < activeTest.Tables[0].Rows.Count; i++)
             {
-                Console.ForegroundColor = ConsoleColor.Magenta;
-                Console.WriteLine("Quesiton - " + questions[i].GetQuestionText());
-                Console.ForegroundColor = ConsoleColor.White;
-                Console.WriteLine("Answer 1 : " + questions[i].GetAnswer1Text());
-                Console.WriteLine("Answer 2 : " + questions[i].GetAnswer2Text());
-                Console.WriteLine("Answer 3 : " + questions[i].GetAnswer3Text());
-                Console.WriteLine("Answer 4 : " + questions[i].GetAnswer4Text());
-                DisplayUserFunctionality();
-                memoForAdd.AddStudentsAnswers(ValidateInput(Console.ReadLine()));
+                //Loops through arrays as rows so it resets index
+                row = activeTest.Tables[0].Rows[i].ItemArray;
+                testID.Add(Convert.ToInt16(row[0]));
+                testNames.Add("" + row[1]);
+                teacherID.Add(Convert.ToInt16(row[2]));
+                testCount.Add(Convert.ToInt16(row[3]));
             }
 
-            return memoForAdd;
+            DataSet activeTeacher = new DataSet();
+
+            activeTeacher = data.GetSpecificTeacher(dbConn, teacherID[0]);
+            List<string> teacherNames = new List<string>();
+            List<string> teacherSubjects = new List<string>();
+
+            for (int i = 0; i < activeTeacher.Tables[0].Rows.Count; i++)
+            {
+                //Loops through arrays as rows so it resets index
+                row = activeTeacher.Tables[0].Rows[i].ItemArray;
+                teacherNames.Add("" + row[1]);
+                teacherSubjects.Add("" + row[2]);
+            }
+
+            //Question details
+            Console.WriteLine("Teacher Name: " + teacherNames + "\n");
+            Console.WriteLine("Teacher Subject: " + teacherSubjects + "\n");
+            Console.WriteLine("Test Name : " + testNames[0] + "\n");
+
+            int totalQuestions = testCount[0];
+
+            DataSet questions = new DataSet();
+            questions = data.GetSpecificTestQuestions(dbConn, testID[0]);
+            List<string> question = new List<string>();
+
+            for (int i = 0; i < totalQuestions; i++)
+            {
+                row = questions.Tables[0].Rows[i].ItemArray;
+
+                Console.ForegroundColor = ConsoleColor.Magenta;
+                Console.WriteLine("Quesiton - " + row[2]);
+                Console.ForegroundColor = ConsoleColor.White;
+                Console.WriteLine("Answer 1 : " + row[3]);
+                Console.WriteLine("Answer 2 : " + row[4]);
+                Console.WriteLine("Answer 3 : " + row[5]);
+                Console.WriteLine("Answer 4 : " + row[6]);
+                DisplayUserFunctionality();
+
+                int answer = ValidateRange(Console.ReadLine(),1,4);
+
+                Student temp = tempStd;
+                data.InsertStudentAnswer(dbConn, Convert.ToInt16(tempStd.GetID()), Convert.ToInt16(row[0]), answer);
+            }
+
+            return testID[0];
         }
 
-        public static void DataAccessTest()
+        public static SqlConnection DataAccessTest(string connectionString, SqlConnection dbConn)
         {
-            string message = data.TestConnection(connectionString, dbConn);
+            dbConn = data.TestConnection(connectionString, dbConn);
+            return dbConn;
         }
     }
 }

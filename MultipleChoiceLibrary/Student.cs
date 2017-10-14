@@ -9,13 +9,16 @@ namespace MultipleChoiceLibrary
     public class Student : Person
     {
         //Stores info regarding to test
+        private string id;
         private string studentNumber;
+        private string password;
         private List<Memo> completedTests = new List<Memo>();
 
         public Student() { }
 
-        public Student(string name, string studentNumber) : base(name)
+        public Student(string id, string name, string password, string studentNumber) : base(name)
         {
+            this.id = id;
             this.studentNumber = studentNumber;
         }
 
@@ -26,6 +29,11 @@ namespace MultipleChoiceLibrary
             return info;
         }
 
+        public void SetID(string id)
+        {
+            this.id = id;
+        }
+
         public void SetName(string name)
         {
             this.name = name;
@@ -34,6 +42,21 @@ namespace MultipleChoiceLibrary
         public void SetStudentNumber(string studentNumber)
         {
             this.studentNumber = studentNumber;
+        }
+
+        public void SetPassword(string password)
+        {
+            this.password = password;
+        }
+
+        public string GetID()
+        {
+            return id;
+        }
+
+        public string GetPassword()
+        {
+            return password;
         }
 
         public string GetName()
